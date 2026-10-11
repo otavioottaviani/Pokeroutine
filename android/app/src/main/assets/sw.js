@@ -1,0 +1,6 @@
+const CACHE='pokeroutine-shell-v3';
+const POKEMON_IDS=[1,2,3,4,5,6,7,8,9,25,39,43,58,129,133,134,135,136,152,153,154,155,156,157,158,159,160,196,197,252,253,254,255,256,257,258,259,260,387,388,389,390,391,392,393,394,395,470,471,700];
+const FILES=['./','./index.html','./styles.css','./app.js','./manifest.webmanifest','./icon.svg','./icon-192.png','./icon-512.png','./assets/fonts/PixelifySans-Variable.ttf','./assets/fonts/PressStart2P-Regular.ttf',...POKEMON_IDS.map(id=>`./pokemon/${id}.png`)];
+self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(FILES)).then(()=>self.skipWaiting())));
+self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim())));
+self.addEventListener('fetch',event=>{if(event.request.method!=='GET')return;const url=new URL(event.request.url);if(url.origin!==location.origin)return;event.respondWith(caches.match(event.request).then(cached=>cached||fetch(event.request).then(response=>{if(response.ok)caches.open(CACHE).then(cache=>cache.put(event.request,response.clone()));return response}).catch(()=>caches.match('./index.html'))))});

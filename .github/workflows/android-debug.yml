@@ -1,0 +1,130 @@
+name: PokéRoutine Android debug APK
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-debug-apk:
+    name: Build and verify debug APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+
+    steps:
+      - name: Check out PokéRoutine
+        uses: actions/checkout@v6
+
+      - name: Test Pokémon catalog, evolution rules and bundled sprites
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+      - run: node --check app.js && node --check sw.js && node --test tests/pokemon-system.test.cjs
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Install Android SDK components
+        uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools platforms;android-35 build-tools;35.0.0'
+
+      - name: Reuse the GitHub debug signing identity on later builds
+        uses: actions/cache@v6
+        with:
+          path: ~/.android/debug.keystore
+          key: pokeroutine-debug-keystore-v1
+
+      - name: Build APK from current web app and local assets
+        working-directory: android
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          SDK_PATH="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-$HOME/.android/sdk}}"
+          if [[ -z "$SDK_PATH" || ! -d "$SDK_PATH/platforms/android-35" ]]; then
+            echo "Android SDK API 35 was not found in ANDROID_HOME/ANDROID_SDK_ROOT." >&2
+            exit 1
+          fi
+
+          # local.properties is machine-specific and ignored by Git. Generate a runner-local path.
+          printf 'sdk.dir=%s\n' "$SDK_PATH" > local.properties
+          sed -i 's/\r$//' ./gradlew
+          chmod +x ./gradlew
+
+          # Use the current web app as the source of truth for the Android WebView package.
+          cp ../index.html ../styles.css ../app.js ../manifest.webmanifest ../sw.js \
+             ../icon.svg ../icon-192.png ../icon-512.png app/src/main/assets/
+          mkdir -p app/src/main/assets/assets app/src/main/assets/pokemon
+          cp -a ../assets/. app/src/main/assets/assets/
+          cp -a ../pokemon/. app/src/main/assets/pokemon/
+
+          ./gradlew --version
+          ./gradlew --no-daemon --stacktrace :app:assembleDebug
+
+      - name: Verify APK signature and packaged app resources
+        shell: bash
+        run: |
+          set -euo pipefail
+          APK="android/app/build/outputs/apk/debug/app-debug.apk"
+          test -s "$APK"
+
+          SDK_PATH="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-$HOME/.android/sdk}}"
+          "$SDK_PATH/build-tools/35.0.0/apksigner" verify --verbose "$APK"
+          unzip -Z1 "$APK" > "$RUNNER_TEMP/pokeroutine-apk-entries.txt"
+
+          required_entries=(
+            assets/index.html
+            assets/styles.css
+            assets/app.js
+            assets/manifest.webmanifest
+            assets/sw.js
+            assets/icon.svg
+            assets/icon-192.png
+            assets/icon-512.png
+            assets/assets/fonts/PixelifySans-Variable.ttf
+            assets/assets/fonts/PixelifySans-OFL.txt
+            assets/assets/fonts/PressStart2P-Regular.ttf
+            assets/assets/fonts/PressStart2P-OFL.txt
+            assets/pokemon/1.png
+            assets/pokemon/4.png
+            assets/pokemon/7.png
+            assets/pokemon/25.png
+            assets/pokemon/39.png
+            assets/pokemon/43.png
+            assets/pokemon/58.png
+            assets/pokemon/129.png
+            assets/pokemon/133.png
+            assets/pokemon/LICENCE-PokeAPI.txt
+            res/raw/pokeroutine_alert.wav
+          )
+          for entry in "${required_entries[@]}"; do
+            if ! grep -Fxq "$entry" "$RUNNER_TEMP/pokeroutine-apk-entries.txt"; then
+              echo "APK is missing expected current app resource: $entry" >&2
+              exit 1
+            fi
+          done
+
+          pokemon_ids=(1 2 3 4 5 6 7 8 9 25 39 43 58 129 133 134 135 136 152 153 154 155 156 157 158 159 160 196 197 252 253 254 255 256 257 258 259 260 387 388 389 390 391 392 393 394 395 470 471 700)
+          for id in "${pokemon_ids[@]}"; do
+            entry="assets/pokemon/$id.png"
+            if ! grep -Fxq "$entry" "$RUNNER_TEMP/pokeroutine-apk-entries.txt"; then
+              echo "APK is missing the sprite for Pokédex #$id: $entry" >&2
+              exit 1
+            fi
+          done
+
+          echo "APK size: $(du -h "$APK" | cut -f1)"
+          sha256sum "$APK"
+
+      - name: Upload installable APK
+        uses: actions/upload-artifact@v6
+        with:
+          name: Pokeroutine-debug-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 30

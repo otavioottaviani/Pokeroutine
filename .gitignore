@@ -1,0 +1,26 @@
+# Android local machine configuration and generated outputs
+android/local.properties
+android/.gradle/
+android/**/build/
+android/.idea/
+android/**/.idea/
+android/**/.cxx/
+
+# Local test material and build products
+work/
+aapt-attempt.partial
+*.apk
+
+# Local credentials and signing material
+.env
+.env.*
+!.env.example
+*.keystore
+*.jks
+*.p12
+*.pem
+*.key
+
+# Common editor and operating-system files
+.DS_Store
+Thumbs.db
