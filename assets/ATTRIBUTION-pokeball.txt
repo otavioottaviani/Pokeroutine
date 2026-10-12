@@ -1,0 +1,6 @@
+Ícone vetorial usado: “Poké Ball icon.svg”, criado por Andreuvv.
+Origem: https://commons.wikimedia.org/wiki/File:Pok%C3%A9_Ball_icon.svg
+Arquivo original: https://upload.wikimedia.org/wikipedia/commons/5/53/Pok%C3%A9_Ball_icon.svg
+Licença do asset: Creative Commons Attribution-ShareAlike 4.0 (CC BY-SA 4.0): https://creativecommons.org/licenses/by-sa/4.0/
+Alterações nesta cópia: fundo preto adicionado. O ícone Android e os PNGs PWA são uma adaptação pixel art do mesmo desenho; também disponibilizados sob CC BY-SA 4.0.
+O uso da imagem não indica endosso pelo autor. Pokémon e Poké Ball são marcas de seus respectivos titulares.

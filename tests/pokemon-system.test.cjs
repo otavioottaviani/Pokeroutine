@@ -66,7 +66,9 @@ test('service worker prepara os mesmos 50 sprites para uso offline', () => {
   const match=sw.match(/const POKEMON_IDS=(\[[^\]]+\])/);
   assert.ok(match,'lista de sprites não encontrada no service worker');
   assert.deepEqual(JSON.parse(match[1]),expectedIds);
-  assert.match(sw,/pokeroutine-shell-v3/);
+  assert.match(sw,/pokeroutine-shell-v4/);
+  assert.match(sw,/\.\/assets\/pokeball-commons\.svg/);
+  assert.ok(fs.existsSync(path.join(root,'assets/pokeball-commons.svg')),'asset Poké Bola offline não encontrado');
   const workflow=fs.readFileSync(path.join(root,'.github/workflows/android-debug.yml'),'utf8');
   const workflowIds=workflow.match(/pokemon_ids=\(([^)]+)\)/);
   assert.ok(workflowIds,'workflow sem verificação de sprites no APK');

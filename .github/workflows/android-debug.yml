@@ -86,6 +86,8 @@ jobs:
             assets/icon.svg
             assets/icon-192.png
             assets/icon-512.png
+            assets/assets/pokeball-commons.svg
+            assets/assets/ATTRIBUTION-pokeball.txt
             assets/assets/fonts/PixelifySans-Variable.ttf
             assets/assets/fonts/PixelifySans-OFL.txt
             assets/assets/fonts/PressStart2P-Regular.ttf
