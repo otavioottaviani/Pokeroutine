@@ -1,60 +1,95 @@
 # PokéRoutine
 
-Aplicativo Android em WebView, com dados existentes em `localStorage` (`pokeroutine-v1`). O formato foi mantido; a configuração `sound` é aditiva e usa o padrão ligado para instalações antigas.
+PokéRoutine é um organizador de tarefas para Android com uma apresentação retrô inspirada em RPGs Pokémon. Concluir tarefas dá XP ao treinador e acompanha o crescimento do Pokémon companheiro. A interface e os recursos essenciais ficam no próprio aplicativo; a rotina não é enviada para um servidor.
 
-## Estrutura
+> Projeto de fã, sem vínculo oficial com Nintendo, The Pokémon Company ou Pokémon. Pokémon e Poké Ball são marcas de seus respectivos titulares.
 
-- `index.html`, `styles.css`, `app.js`: telas de agenda, tarefas, XP, companheiro, região, equipe, Pokédex, backup e preferências.
-- `assets/fonts`: Pixelify Sans e Press Start 2P, com licenças SIL Open Font License para funcionar sem internet.
-- `android/app/src/main/assets`: cópia offline dos arquivos da interface, fontes e 50 sprites PNG usados pelo app e verificados pelo workflow Android.
-- `android/app/src/main/java`: Activity WebView, ponte JavaScript, agendamento/cancelamento nativo, restauração após reinicialização e backup pelo seletor Android.
-- `android/app/src/main/res/mipmap-*`: ícone pixelado calendário + Poké Bola nas cinco densidades do launcher Android. `res/raw/pokeroutine_alert.wav` é uma melodia original curta de onda quadrada, sem áudio de jogos Pokémon.
+## O que o aplicativo faz
 
-O catálogo local tem os 12 iniciais das gerações 1–4, suas 36 formas evolutivas, Eevee e as oito evoluções, além das cinco espécies extras que já existiam. Os PNGs locais vêm do [repositório de sprites da PokéAPI](https://github.com/PokeAPI/sprites); o arquivo de licença e o aviso de direitos autorais do Pokémon foram preservados em `pokemon/LICENCE-PokeAPI.txt`. A disponibilidade do sprite no repositório não concede direitos sobre marcas e personagens Pokémon.
+- Cadastra, edita, conclui e exclui tarefas; tarefas podem ter data, horário e lembrete.
+- Mantém agenda semanal e progresso de XP do treinador.
+- Permite escolher um inicial das gerações 1 a 4 ou sortear um no primeiro uso.
+- Evolui as linhas dos iniciais no nível 5 e novamente no nível 10. Eevee evolui no nível 5 para uma das oito formas, sorteada uma única vez.
+- Registra formas encontradas/evoluídas na Pokédex e oferece áreas de equipe e região.
+- Pode conceder uma Poké Bola surpresa ao concluir uma tarefa pela primeira vez; repetir a conclusão não duplica XP ou prêmio.
+- Agenda lembretes locais no Android e permite ativar/desativar o som nas configurações do app.
+- Inclui sprites e fontes locais para que a interface principal não dependa de baixar esses recursos da internet.
 
-## Evoluções, encontros e dados antigos
+## Dados, privacidade e backup
 
-Os níveis de treinador 5 e 10 evoluem os iniciais para a segunda e terceira forma, respectivamente. Eevee evolui no nível 5 para uma das oito formas com chances iguais. A forma, o histórico e a Pokédex são salvos no mesmo `localStorage` `pokeroutine-v1`; a migração acrescenta campos, mas mantém XP, tarefas, companheiro, Pokébolas e configurações antigas. As evoluções desbloqueadas não são revertidas ao trocar de companheiro ou reiniciar.
+No Android, tarefas e progresso ficam no armazenamento local do aplicativo, usando `localStorage` (`pokeroutine-v1`). Não existe sincronização automática entre aparelhos ou entre o APK e a versão web. Cada navegador e cada instalação Android mantêm seus próprios dados.
 
-O primeiro uso oferece a escolha manual dos 12 iniciais ou um sorteio. Encontros podem revelar iniciais base, Eevee e espécies extras já existentes; uma recompensa surpresa de Pokébola tem chance de 8% na primeira conclusão registrada de cada tarefa. Reabrir e concluir de novo uma tarefa não duplica XP nem essa recompensa.
+Use a opção **Backup** dentro do aplicativo para exportar seus dados para um arquivo JSON. Guarde esse arquivo fora do app. Se reinstalar o app ou trocar de aparelho, instale a nova versão e use **Restaurar backup** para importar o JSON. A importação substitui os dados atuais do app pelos dados do arquivo; exporte um backup recente antes de importar.
 
-## Testar a versão web no computador ou no Motorola
+## Abrir a versão web
 
-O Node.js já instalado é suficiente; não é preciso instalar pacote npm. No computador, dê duplo clique em `start-pokeroutine.bat`, mantenha a janela aberta e abra `http://localhost:8765` no navegador. O servidor entrega apenas arquivos estáticos do projeto e para ao fechar a janela ou pressionar Ctrl+C.
+É necessário ter Node.js instalado; não há pacote npm para instalar.
 
-Para abrir no Motorola pela mesma rede Wi-Fi, dê duplo clique em `start-pokeroutine-lan.bat`. Copie para o Chrome do celular um endereço `http://IP-DO-COMPUTADOR:8765` que aparecer no terminal. Se o Windows perguntar, permita o Node.js somente em redes privadas. O servidor é somente leitura e não sincroniza os dados: tarefas criadas no Chrome do celular ficam no armazenamento local desse navegador, separado dos dados do APK.
+1. No Windows, dê duplo clique em `start-pokeroutine.bat`.
+2. Mantenha a janela do servidor aberta.
+3. Abra <http://localhost:8765> no navegador do computador.
+4. Para parar o servidor, feche a janela ou pressione `Ctrl+C`.
 
-A página web/PWA não é um APK Android. No computador, `localhost` permite recursos de origem segura; no celular, o endereço IP pela rede local usa HTTP e pode não habilitar instalação PWA nem service worker. A versão web também não usa a ponte Android de alarmes: notificações do navegador dependem de permissões e timers da página podem atrasar ou parar quando ela fecha. Use o APK nativo para lembretes agendados confiáveis.
+Para testar no Motorola pela mesma rede Wi-Fi, execute `start-pokeroutine-lan.bat`, permita o Node.js somente em redes privadas se o Windows perguntar e abra no Chrome do celular o endereço de rede mostrado no terminal. Os dados criados nessa página ficam no armazenamento do navegador do celular; eles não são os dados do APK.
 
-## Lembretes Android
+A versão web/PWA é útil para testar a interface, mas não é um APK. Notificações locais agendadas e o ícone do launcher Android devem ser conferidos na versão Android.
 
-Ative **Mais → Configurações → Notificações de tarefas** e aceite a permissão do Android 13+. Defina dia e horário na tarefa e marque **Lembrar no horário configurado**. O receptor Android agenda alarmes que chegam com o WebView fechado, atualiza o mesmo identificador quando reagendado, cancela quando concluído ou excluído e restaura alarmes futuros após reiniciar o aparelho.
+## Gerar e baixar o APK pelo GitHub Actions
 
-Android 12+ pode exigir **Mais → Configurar horário exato** para aproximar o lembrete do minuto definido. Sem esse acesso, o app usa alarme compatível de menor precisão, que o modo Doze/economia de bateria pode atrasar. Os canais Android controlam som e importância; o canal sonoro é criado uma única vez. Se você mudar o som pelo sistema, a preferência do canal Android prevalece; ajuste em **Configurações → Apps → PokéRoutine → Notificações**. O navegador/PWA continua limitado: avisos em background não são garantidos pelo app aberto ou por timers JavaScript.
+O repositório é privado; é necessário entrar com uma conta autorizada para ver o código e os artefatos. O workflow manual está em `.github/workflows/android-debug.yml`.
 
-## Compilação
+1. Abra o repositório **Pokeroutine** no GitHub e selecione a aba **Actions**.
+2. Escolha **PokéRoutine Android debug APK** na lista de workflows.
+3. Clique em **Run workflow**, selecione a branch `main` e confirme a execução.
+4. Aguarde o job terminar. Só considere válido quando a execução estiver verde (**Success**); se estiver vermelha, abra os logs para ver a etapa que falhou.
+5. Na página dessa execução bem-sucedida, localize **Artifacts** e baixe **Pokeroutine-debug-apk**.
+6. Extraia o ZIP. O APK dentro dele se chama `app-debug.apk`.
 
-O projeto usa Gradle 8.9, Android Gradle Plugin 8.7.3, SDK 35 e `minSdk 23`. Build de depuração:
+O artefato fica disponível por **30 dias** após a execução. O workflow roda testes, prepara os arquivos web e os sprites locais dentro do pacote Android, compila o módulo `:app` em Linux e verifica a assinatura e recursos esperados antes de publicar o artefato. Ele usa Java 17, Gradle Wrapper 8.9, Android Gradle Plugin 8.7.3, Android SDK 35 e Build Tools 35.0.0. A compilação não usa o AAPT do Windows.
+
+## Instalar ou atualizar no Motorola
+
+1. Transfira `app-debug.apk` para o telefone por USB ou baixe-o e extraia-o no próprio aparelho.
+2. Abra o APK usando **Arquivos**. Se o Android pedir, permita temporariamente que o app usado para abrir o arquivo instale apps desconhecidos; o nome/caminho da opção varia conforme a versão do Android.
+3. Confirme **Instalar** e abra o PokéRoutine.
+4. Permita notificações quando o Android perguntar, se quiser receber lembretes.
+
+Instalar por cima costuma preservar os dados quando o APK tem a mesma assinatura da versão já instalada. O primeiro APK assinado no GitHub Actions pode ter uma assinatura diferente da versão de depuração que foi compilada no Windows; nesse caso, o Android pode impedir a atualização. **Antes de desinstalar a versão antiga, exporte um backup JSON.** Desinstalar apaga os dados locais do app. Depois de instalar o APK novo, restaure o backup.
+
+As execuções do workflow reutilizam uma chave de depuração em cache para permitir atualizações entre builds enquanto esse cache existir. Se o cache expirar ou for removido, a assinatura pode mudar; guarde um backup antes de atualizar caso haja dúvida.
+
+## Lembretes e som no Android
+
+O Android agenda os lembretes localmente, então eles não dependem de o app ficar aberto. No Android 13 ou superior, autorize notificações. Em versões recentes, o Android também pode pedir acesso a alarmes exatos; sem esse acesso, o comportamento depende das permissões e das restrições da versão do aparelho. O receptor do app restaura os lembretes salvos após a reinicialização do telefone.
+
+O canal de notificações respeita o volume, o modo silencioso e as configurações do Android. Se uma notificação chegar sem som, verifique **Configurações do Android → Apps → PokéRoutine → Notificações** e confira o som do canal. A preferência de som do aplicativo também pode ser desligada nas configurações do próprio PokéRoutine. Economia de bateria e configurações do fabricante podem atrasar alarmes; isso varia por aparelho.
+
+## Estrutura do projeto
+
+- `index.html`, `styles.css`, `app.js`: versão web e interface embarcada no WebView Android.
+- `assets/fonts`: Pixelify Sans e Press Start 2P, com licenças SIL OFL.
+- `assets/pokemon`: sprites locais usados pelo app; a atribuição está em `pokemon/LICENCE-PokeAPI.txt`.
+- `assets/pokeball-commons.svg` e `assets/ATTRIBUTION-pokeball.txt`: asset e atribuição/licença da Poké Ball do Wikimedia Commons. Os ícones PWA e Android usam uma adaptação pixel art documentada no mesmo arquivo.
+- `android/app/src/main/assets`: cópia dos arquivos web e assets que o app Android carrega offline. O workflow sincroniza essa pasta com a versão raiz antes de compilar.
+- `android/app/src/main/java`: Activity WebView, ponte JavaScript, notificações e backup Android.
+- `android/app/src/main/res/mipmap-*`: ícones de fallback para o launcher. `mipmap-anydpi-v26` contém os ícones adaptativos.
+- `android/app/src/main/res/raw/pokeroutine_alert.wav`: efeito curto original de 8-bit, sem áudio extraído dos jogos Pokémon.
+- `tests/pokemon-system.test.cjs`: testes de catálogo, sprites, seleção, XP, evolução e persistência.
+
+## Créditos dos assets
+
+- Sprites de Pokémon: [PokeAPI/sprites](https://github.com/PokeAPI/sprites); consulte `pokemon/LICENCE-PokeAPI.txt` para o aviso e a atribuição mantidos no projeto. A disponibilidade desses sprites não concede direitos sobre Pokémon.
+- Ícone da Poké Ball: [Andreuvv, Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Pok%C3%A9_Ball_icon.svg), sob [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). O projeto adiciona fundo preto e adapta o desenho para pixel art; os detalhes estão em `assets/ATTRIBUTION-pokeball.txt`.
+- Fontes: arquivos e textos de licença SIL OFL estão juntos em `assets/fonts`.
+
+## Testes locais
+
+Na pasta do projeto, execute:
 
 ```powershell
-$env:JAVA_HOME='D:\PokeroutineTools\jdk-17.0.20.1+1'
-$env:ANDROID_HOME='D:\PokeroutineTools\android-sdk'
-$env:ANDROID_SDK_ROOT=$env:ANDROID_HOME
-$env:GRADLE_USER_HOME='D:\PokeroutineTools\gradle-home'
-Set-Location 'C:\Users\beano\Documents\Codex\2026-10-11\files-pasted-by-the-user-desenvolva\outputs\Pokeroutine\android'
-& 'D:\PokeroutineTools\gradle-8.9\bin\gradle.bat' --no-daemon assembleDebug
+node --check .\app.js
+node --check .\sw.js
+node --test .\tests\pokemon-system.test.cjs
 ```
 
-Nesta alteração, `node --check` passou para `app.js`, `sw.js` e o arquivo de testes. `node --test tests/pokemon-system.test.cjs` passou em 11 testes cobrindo o catálogo, sprites de 96×96 nos assets web/Android e cache offline, migração legada, seleção manual/sorteada, barra de XP até o requisito, as 12 linhas iniciais, as oito evoluções de Eevee, persistência e recompensa única. O workflow Linux valida explicitamente os 50 sprites dentro do APK. Tentei abrir a página num browser local isolado, mas esse browser não alcançou o servidor; portanto, não confirmei a renderização visual nele nem num aparelho nesta sessão. Ainda não gerei um APK nesta alteração; a compilação Windows continua sujeita ao erro nativo AAPT2 0xC0000005 descrito abaixo e o workflow depende de o projeto ser enviado a um repositório GitHub privado pelo usuário.
-
-### Gerar APK debug no GitHub Actions (Linux)
-
-O workflow manual está em `.github/workflows/android-debug.yml`. Ele roda os testes Node, compila o módulo `:app` com Java 17, Gradle Wrapper 8.9, Android Gradle Plugin 8.7.3, SDK 35 e Build Tools 35.0.0. Antes de compilar, copia para os assets Android a interface, fontes e sprites atuais da versão web; depois verifica a assinatura e a presença dos 50 sprites dentro do APK. O `android/local.properties` da máquina local é ignorado e o workflow cria um arquivo temporário com o SDK instalado no runner Linux. A identidade de assinatura de depuração do runner é guardada no cache para builds seguintes. Como caches podem expirar, uma expiração pode fazer o Android exigir instalação com migração de dados novamente.
-
-Para executar, crie no GitHub um repositório **privado** vazio chamado `Pokeroutine`. No PowerShell, entre na pasta do projeto `outputs\Pokeroutine` e execute `git init -b main`, `git add .`, `git status --short` e `git commit -m "Preparar build Android no GitHub Actions"`. Confira que `android/local.properties`, `work/` e `aapt-attempt.partial` não aparecem no status. Depois conecte o endereço do repositório privado com `git remote add origin https://github.com/SEU-USUARIO/Pokeroutine.git` (substitua `SEU-USUARIO` pelo seu usuário) e envie com `git push -u origin main`. Isso só envia quando você executar explicitamente o último comando; o projeto não foi enviado pelo Codex.
-
-No GitHub, abra **Actions → PokéRoutine Android debug APK → Run workflow**. Aguarde o job verde e baixe `Pokeroutine-debug-apk` na seção **Artifacts** daquela execução. O arquivo dentro do ZIP será `app-debug.apk`. Se a etapa de verificação falhar, o job fica vermelho e não apresenta um artefato como build válido. O workflow ainda não foi executado: a pasta não está conectada a um repositório GitHub. Como o primeiro APK Linux terá uma chave de depuração diferente da compilação Windows já instalada, Android poderá recusar a atualização por assinatura incompatível. Antes de desinstalar a versão antiga nesse caso, exporte o backup dentro do app; depois instale o APK Linux e importe o arquivo de backup. Builds Linux seguintes reutilizam a chave enquanto o cache existir.
-
-## Instalação no Motorola
-
-Quando um build `assembleDebug` concluir, o APK estará em `android/app/build/outputs/apk/debug/app-debug.apk`. Copie para o celular e abra-o para instalar, permitindo instalação dessa origem quando o Android pedir. Para atualizar preservando o `localStorage`, instale por cima da versão anterior; não desinstale o app. O Android pode apresentar o pedido de permissão de notificações na primeira ativação.
+Para compilar manualmente, é preciso Java 17 e Android SDK 35. No PowerShell, entre em `android` e execute `..\gradlew.bat --no-daemon :app:assembleDebug`. O arquivo local, se a compilação terminar com sucesso, sai em `android\app\build\outputs\apk\debug\app-debug.apk`. A rota recomendada para este projeto é o workflow Linux descrito acima.
