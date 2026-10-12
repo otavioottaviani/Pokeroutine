@@ -47,7 +47,7 @@ O repositório é privado; é necessário entrar com uma conta autorizada para v
 
 O artefato fica disponível por **30 dias** após a execução. O workflow roda testes, prepara os arquivos web e os sprites locais dentro do pacote Android, compila o módulo `:app` em Linux e verifica a assinatura e recursos esperados antes de publicar o artefato. Ele usa Java 17, Gradle Wrapper 8.9, Android Gradle Plugin 8.7.3, Android SDK 35 e Build Tools 35.0.0. A compilação não usa o AAPT do Windows.
 
-## Instalar ou atualizar no Motorola
+## Instalar ou atualizar 
 
 1. Transfira `app-debug.apk` para o telefone por USB ou baixe-o e extraia-o no próprio aparelho.
 2. Abra o APK usando **Arquivos**. Se o Android pedir, permita temporariamente que o app usado para abrir o arquivo instale apps desconhecidos; o nome/caminho da opção varia conforme a versão do Android.
